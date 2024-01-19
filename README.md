@@ -1,2 +1,3 @@
 # Open API Swagger Github Pages
-a
+
+Just an example

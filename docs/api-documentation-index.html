@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal</title>
+  </head>
+  <body>
+    <button onclick="handleNavigation('test/index.html')">
+      Ir para documentação de testes do workflow do github
+    </button>
+    <button onclick="handleNavigation('dev/index.html')">Ir para documentação de dev</button>
+    <button onclick="handleNavigation('stg/index.html')">Ir para documentação de stg</button>
+    <button onclick="handleNavigation('prd/index.html')">Ir para documentação de prd</button>
+  </body>
+
+  <script>
+    function handleNavigation(route) {
+      window.location.href = route
+    }
+  </script>
+</html>

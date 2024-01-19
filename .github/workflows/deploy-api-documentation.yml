@@ -1,0 +1,182 @@
+name: Deploy API Documentation
+on:
+  push:
+    branches:
+      - api-documentation-github-pages
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: The environment that the documentation points to
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifact from test branch
+        uses: actions/github-script@v6
+        continue-on-error: true
+        env:
+          WORKFLOW_FILENAME: deploy-api-documentation.yml
+          ARTIFACT_NAME: github-pages
+          ARTIFACT_FILENAME: github-pages.zip
+          UNZIP_DIR: github-pages-artifacts-test
+        with:
+          script: |
+            const script = require('./scripts/download-artifact-from-previous-run.js')
+            await script({github, context, core})
+
+      - name: Download artifact from dev
+        uses: actions/github-script@v6
+        continue-on-error: true
+        env:
+          WORKFLOW_FILENAME: deploy-to-dev.yml
+          ARTIFACT_NAME: github-pages
+          ARTIFACT_FILENAME: github-pages.zip
+          UNZIP_DIR: github-pages-artifacts-dev
+        with:
+          script: |
+            const script = require('./scripts/download-artifact-from-previous-run.js')
+            await script({github, context, core})
+
+      - name: Download artifact from stg
+        uses: actions/github-script@v6
+        continue-on-error: true
+        env:
+          WORKFLOW_FILENAME: deploy-to-stg.yml
+          ARTIFACT_NAME: github-pages
+          ARTIFACT_FILENAME: github-pages.zip
+          UNZIP_DIR: github-pages-artifacts-stg
+        with:
+          script: |
+            const script = require('./scripts/download-artifact-from-previous-run.js')
+            await script({github, context, core})
+
+      - name: Download artifact from prd
+        uses: actions/github-script@v6
+        continue-on-error: true
+        env:
+          WORKFLOW_FILENAME: deploy-to-prd.yml
+          ARTIFACT_NAME: github-pages
+          ARTIFACT_FILENAME: github-pages.zip
+          UNZIP_DIR: github-pages-artifacts-prd
+        with:
+          script: |
+            const script = require('./scripts/download-artifact-from-previous-run.js')
+            await script({github, context, core})
+
+      - name: extract github pages artifact
+        run: |
+          tar -xvf github-pages-artifacts-test/artifact.tar -C github-pages-artifacts-test || mkdir -p github-pages-artifacts-test
+          tar -xvf github-pages-artifacts-dev/artifact.tar -C github-pages-artifacts-dev || mkdir -p github-pages-artifacts-dev
+          tar -xvf github-pages-artifacts-stg/artifact.tar -C github-pages-artifacts-stg || mkdir -p github-pages-artifacts-stg
+          tar -xvf github-pages-artifacts-prd/artifact.tar -C github-pages-artifacts-prd || mkdir -p github-pages-artifacts-prd
+
+      - name: List files
+        run: ls -R
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Get Latest Swagger UI Release
+        id: swagger-ui
+        env:
+          CURRENT_SWAGGER_VERSION: v5.11.0
+        run: |
+          release_tag=$(curl -sL https://api.github.com/repos/swagger-api/swagger-ui/releases/latest | jq -r ".tag_name")
+          echo "release_tag=$release_tag" >> $GITHUB_OUTPUT
+          current_tag=$CURRENT_SWAGGER_VERSION
+          echo "current_tag=$current_tag" >> $GITHUB_OUTPUT
+
+      - name: Copy openapi json spec to root
+        run: cp docs/openapi.json openapi.json
+
+      - name: Update Swagger UI
+        # if: steps.swagger-ui.outputs.current_tag != steps.swagger-ui.outputs.release_tag
+        env:
+          RELEASE_TAG: ${{ steps.swagger-ui.outputs.release_tag }}
+          OPENAPI_FILE: "openapi.json"
+          ENVIRONMENT: ${{ inputs.environment || 'test' }}
+        run: |
+          # Creates the docs-dist folder
+          mkdir -p docs-dist docs-dist/test docs-dist/dev docs-dist/stg docs-dist/prd       
+
+          # colon means no-op
+          mv -v github-pages-artifacts-test/test/* docs-dist/test/ || :
+          mv -v github-pages-artifacts-dev/dev/* docs-dist/dev/ || :
+          mv -v github-pages-artifacts-stg/stg/* docs-dist/stg/ || :
+          mv -v github-pages-artifacts-prd/prd/* docs-dist/prd/ || :
+
+          ls -Rla
+  
+          # temporary commands to clean duplicated folders
+          find ./docs-dist/test -mindepth 1 -type d -name test -prune -exec rm -rf {} \;
+          find ./docs-dist/dev -mindepth 1 -type d -name dev -prune -exec rm -rf {} \;
+          find ./docs-dist/stg -mindepth 1 -type d -name stg -prune -exec rm -rf {} \;
+          find ./docs-dist/prd -mindepth 1 -type d -name prd -prune -exec rm -rf {} \;
+
+          ls -Rla
+
+          mkdir -p docs-dist/$ENVIRONMENT
+          mv docs/openapi.json docs-dist/$ENVIRONMENT/openapi.json
+          cp docs/api-documentation-index.html docs-dist/index.html
+          # Download the release
+          curl -sL -o $RELEASE_TAG https://api.github.com/repos/swagger-api/swagger-ui/tarball/$RELEASE_TAG
+          # Extract the dist directory
+          tar -xzf $RELEASE_TAG --strip-components=1 -C ./docs-dist $(tar -tzf $RELEASE_TAG | head -1 | cut -f1 -d"/")/dist
+          rm $RELEASE_TAG
+          # Move index.html to the docs-dist folder
+          mv docs-dist/dist/index.html docs-dist/$ENVIRONMENT/index.html
+          # Fix references in docs-dist/dist/swagger-initializer and index.html
+          sed -i "s|https://petstore.swagger.io/v2/swagger.json|$OPENAPI_FILE|g" docs-dist/dist/swagger-initializer.js
+          sed -i "s|href=\"./|href=\"../dist/|g" docs-dist/$ENVIRONMENT/index.html
+          sed -i "s|src=\"./|src=\"../dist/|g" docs-dist/$ENVIRONMENT/index.html
+          sed -i "s|href=\"index|href=\"../dist/index|g" docs-dist/$ENVIRONMENT/index.html
+          # Update current release
+          # echo ${{ steps.swagger-ui.outputs.release_tag }} > swagger-ui.version
+
+      # - name: Deploy
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./docs-dist
+      #     destination_dir: ./docs-dist
+      #     publish_branch: api-documentation-github-pages
+
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: api-documentation-pages
+      #     path: ./docs-dist
+      #     if-no-files-found: warn
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs-dist
+    
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - run: echo "GH_REPO=$(echo ${{ github.repository }} | cut -d "/" -f 2)" >> $GITHUB_ENV
+
+      - run: echo "[Deploying to ${{ steps.deployment.outputs.page_url }}](${{ steps.deployment.outputs.page_url }})" >> "${GITHUB_STEP_SUMMARY}"

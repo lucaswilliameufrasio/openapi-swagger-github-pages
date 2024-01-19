@@ -1,0 +1,17 @@
+name: Deploy to STG
+
+on:
+  release:
+    types:
+      - prereleased
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-api-documentation.yml
+    with:
+      environment: stg

@@ -7,7 +7,7 @@
     "paths": {
       "/": {
         "get": {
-          "operationId": "listVersionsv2",
+          "operationId": "listVersionsV2",
           "summary": "List API versions",
           "produces": [
             "application/json"

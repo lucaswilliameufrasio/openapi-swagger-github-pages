@@ -1,5 +1,4 @@
 # Open API Swagger Github Pages
 
-Just an example
+This projects aims to be an example of how to use Github Pages to host OpenAPI definitions.
 
-noice

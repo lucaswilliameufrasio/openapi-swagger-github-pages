@@ -147,6 +147,9 @@ jobs:
           mkdir -p docs-dist/$ENVIRONMENT
           mv docs/openapi.json docs-dist/$ENVIRONMENT/openapi.json
 
+          cp .github/pages/_headers docs-dist/_headers
+          cp .github/pages/_headers docs-dist/$ENVIRONMENT/_headers
+
           cp docs/api-documentation-index.html docs-dist/index.html
           sed -i "s|Portal|Teste|g" docs-dist/index.html
 

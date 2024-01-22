@@ -37,7 +37,8 @@ jobs:
         continue-on-error: true
         env:
           WORKFLOW_FILENAME: deploy-api-documentation.yml
-          ARTIFACT_NAME: github-pages
+          # ARTIFACT_NAME: github-pages
+          ARTIFACT_NAME: api-documentation-pages
           ARTIFACT_FILENAME: github-pages.zip
           UNZIP_DIR: github-pages-artifacts-test
         with:
@@ -50,7 +51,8 @@ jobs:
         continue-on-error: true
         env:
           WORKFLOW_FILENAME: deploy-to-dev.yml
-          ARTIFACT_NAME: github-pages
+          # ARTIFACT_NAME: github-pages
+          ARTIFACT_NAME: api-documentation-pages
           ARTIFACT_FILENAME: github-pages.zip
           UNZIP_DIR: github-pages-artifacts-dev
         with:
@@ -63,7 +65,8 @@ jobs:
         continue-on-error: true
         env:
           WORKFLOW_FILENAME: deploy-to-stg.yml
-          ARTIFACT_NAME: github-pages
+          # ARTIFACT_NAME: github-pages
+          ARTIFACT_NAME: api-documentation-pages
           ARTIFACT_FILENAME: github-pages.zip
           UNZIP_DIR: github-pages-artifacts-stg
         with:
@@ -76,7 +79,8 @@ jobs:
         continue-on-error: true
         env:
           WORKFLOW_FILENAME: deploy-to-prd.yml
-          ARTIFACT_NAME: github-pages
+          # ARTIFACT_NAME: github-pages
+          ARTIFACT_NAME: api-documentation-pages
           ARTIFACT_FILENAME: github-pages.zip
           UNZIP_DIR: github-pages-artifacts-prd
         with:

@@ -198,7 +198,7 @@ jobs:
       - name: Prepare folder to save in artifacts for future deploys
         run: |
           mkdir -p /tmp/docs-artifacts
-          cp -r cp -r ./docs-dist /tmp/docs-artifacts
+          cp -r ./docs-dist /tmp/docs-artifacts
           find /tmp/docs-artifacts -type f ! -iname "*.json" ! -iname "*.html" -delete
 
       # Used exclusively for deploys between cycles

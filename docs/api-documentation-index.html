@@ -3,15 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <title>Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body>
-    <button onclick="handleNavigation('test/index.html')">
-      Ir para documentação de testes do workflow do github
-    </button>
-    <button onclick="handleNavigation('dev/index.html')">Ir para documentação de dev</button>
-    <button onclick="handleNavigation('stg/index.html')">Ir para documentação de stg</button>
-    <button onclick="handleNavigation('prd/index.html')">Ir para documentação de prd</button>
+    
+    <div class="flex flex-col p-8 space-y-4 content-center items-center">
+      <span class="font-bold text-7xl">Portal</span>
+
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onclick="handleNavigation('test/index.html')"
+      >
+        Ir para documentação de testes do workflow do github
+      </button>
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onclick="handleNavigation('dev/index.html')"
+      >
+        Ir para documentação de dev
+      </button>
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onclick="handleNavigation('stg/index.html')"
+      >
+        Ir para documentação de stg
+      </button>
+      <button
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onclick="handleNavigation('prd/index.html')"
+      >
+        Ir para documentação de prd
+      </button>
+    </div>
   </body>
 
   <script>

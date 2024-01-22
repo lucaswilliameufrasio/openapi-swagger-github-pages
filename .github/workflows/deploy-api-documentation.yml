@@ -185,13 +185,6 @@ jobs:
       #     destination_dir: ./docs-dist
       #     publish_branch: api-documentation-github-pages
 
-      # Used exclusively for deploys between cycles
-      - uses: actions/upload-artifact@v4
-        with:
-          name: api-documentation-pages
-          path: ./docs-dist
-          if-no-files-found: warn
-          retention-days: 15
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -201,6 +194,20 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Prepare folder to save in artifacts for future deploys
+        run: |
+          mkdir -p /tmp/docs-artifacts
+          cp -r cp -r ./docs-dist /tmp/docs-artifacts
+          find /tmp/docs-artifacts -type f ! -iname "*.json" ! -iname "*.html" -delete
+
+      # Used exclusively for deploys between cycles
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-documentation-pages
+          path: /tmp/docs-artifacts
+          if-no-files-found: warn
+          retention-days: 30
 
       - run: echo "GH_REPO=$(echo ${{ github.repository }} | cut -d "/" -f 2)" >> $GITHUB_ENV
 

@@ -172,7 +172,7 @@ jobs:
 
           sed -i '/<meta charset="UTF-8">/a\  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" \/>\n  <meta http-equiv="Pragma" content="no-cache" \/>\n  <meta http-equiv="Expires" content="0" \/>' docs-dist/$ENVIRONMENT/index.html
 
-          sed -i "s|Portal|$APP_NAME_FOR_SWAGGER_PAGES|g" docs-dist/$ENVIRONMENT/index.html
+          sed -i "s|Swagger UI|$APP_NAME_FOR_SWAGGER_PAGES|g" docs-dist/$ENVIRONMENT/index.html
 
           # Update current release
           # echo ${{ steps.swagger-ui.outputs.release_tag }} > swagger-ui.version

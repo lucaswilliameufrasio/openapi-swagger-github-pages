@@ -39,7 +39,7 @@ jobs:
           WORKFLOW_FILENAME: deploy-api-documentation.yml
           # ARTIFACT_NAME: github-pages
           ARTIFACT_NAME: api-documentation-pages
-          ARTIFACT_FILENAME: github-pages.zip
+          ARTIFACT_FILENAME: api-documentation-pages.zip
           UNZIP_DIR: github-pages-artifacts-test
         with:
           script: |
@@ -53,7 +53,7 @@ jobs:
           WORKFLOW_FILENAME: deploy-to-dev.yml
           # ARTIFACT_NAME: github-pages
           ARTIFACT_NAME: api-documentation-pages
-          ARTIFACT_FILENAME: github-pages.zip
+          ARTIFACT_FILENAME: api-documentation-pages.zip
           UNZIP_DIR: github-pages-artifacts-dev
         with:
           script: |
@@ -67,7 +67,7 @@ jobs:
           WORKFLOW_FILENAME: deploy-to-stg.yml
           # ARTIFACT_NAME: github-pages
           ARTIFACT_NAME: api-documentation-pages
-          ARTIFACT_FILENAME: github-pages.zip
+          ARTIFACT_FILENAME: api-documentation-pages.zip
           UNZIP_DIR: github-pages-artifacts-stg
         with:
           script: |
@@ -81,7 +81,7 @@ jobs:
           WORKFLOW_FILENAME: deploy-to-prd.yml
           # ARTIFACT_NAME: github-pages
           ARTIFACT_NAME: api-documentation-pages
-          ARTIFACT_FILENAME: github-pages.zip
+          ARTIFACT_FILENAME: api-documentation-pages.zip
           UNZIP_DIR: github-pages-artifacts-prd
         with:
           script: |
@@ -198,14 +198,16 @@ jobs:
       - name: Prepare folder to save in artifacts for future deploys
         run: |
           mkdir -p /tmp/docs-artifacts
+          mkdir -p /tmp/docs-artifacts-to-upload
           cp -r ./docs-dist /tmp/docs-artifacts
           find /tmp/docs-artifacts -type f ! -iname "*.json" ! -iname "*.html" -delete
+          tar --dereference --hard-dereference --directory "/tmp/docs-artifacts" -cvf "/tmp/docs-artifacts-to-upload/artifact.tar" --exclude=.git --exclude=.github .
 
       # Used exclusively for deploys between cycles
       - uses: actions/upload-artifact@v4
         with:
           name: api-documentation-pages
-          path: /tmp/docs-artifacts
+          path: /tmp/docs-artifacts-to-upload
           if-no-files-found: warn
           retention-days: 30
 

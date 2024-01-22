@@ -5,13 +5,15 @@ on:
     types:
       - prereleased
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
   deploy:
     uses: ./.github/workflows/deploy-api-documentation.yml
     with:
       environment: stg
+    permissions:
+      actions: read
+      contents: read
+      repository-projects: read
+      pull-requests: read
+      pages: write
+      id-token: write

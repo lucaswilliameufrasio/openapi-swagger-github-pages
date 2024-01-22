@@ -181,11 +181,12 @@ jobs:
       #     destination_dir: ./docs-dist
       #     publish_branch: api-documentation-github-pages
 
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: api-documentation-pages
-      #     path: ./docs-dist
-      #     if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-documentation-pages
+          path: ./docs-dist
+          if-no-files-found: warn
+          retention-days: 15
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

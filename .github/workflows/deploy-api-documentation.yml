@@ -151,8 +151,6 @@ jobs:
           cp .github/pages/_headers docs-dist/$ENVIRONMENT/_headers
 
           cp docs/api-documentation-index.html docs-dist/index.html
-          sed -i "s|Portal|Teste|g" docs-dist/index.html
-
           sed -i "s|Portal|$APP_NAME_FOR_ROOT_PAGE|g" docs-dist/index.html
 
           # Download the release

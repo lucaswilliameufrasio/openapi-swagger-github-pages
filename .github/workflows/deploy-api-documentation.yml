@@ -199,7 +199,7 @@ jobs:
         run: |
           mkdir -p /tmp/docs-artifacts
           mkdir -p /tmp/docs-artifacts-to-upload
-          cp -r ./docs-dist /tmp/docs-artifacts
+          cp -r ./docs-dist/* /tmp/docs-artifacts
           find /tmp/docs-artifacts -type f ! -iname "*.json" ! -iname "*.html" -delete
           tar --dereference --hard-dereference --directory "/tmp/docs-artifacts" -cvf "/tmp/docs-artifacts-to-upload/artifact.tar" --exclude=.git --exclude=.github .
 

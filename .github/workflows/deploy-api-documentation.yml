@@ -1,4 +1,5 @@
 name: Deploy API Documentation
+
 on:
   push:
     branches:
@@ -91,7 +92,7 @@ jobs:
             const script = require('./scripts/download-artifact-from-previous-run.js')
             await script({github, context, core})
 
-      - name: extract github pages artifact
+      - name: Extract github pages artifact
         run: |
           tar -xvf github-pages-artifacts-test/artifact.tar -C github-pages-artifacts-test || mkdir -p github-pages-artifacts-test
           tar -xvf github-pages-artifacts-dev/artifact.tar -C github-pages-artifacts-dev || mkdir -p github-pages-artifacts-dev
@@ -124,7 +125,6 @@ jobs:
           echo "value=$timestamp" >> $GITHUB_OUTPUT
 
       - name: Update Swagger UI
-        # if: steps.swagger-ui.outputs.current_tag != steps.swagger-ui.outputs.release_tag
         env:
           RELEASE_TAG: ${{ steps.swagger-ui.outputs.release_tag }}
           OPENAPI_FILE: "openapi.json"
@@ -176,18 +176,6 @@ jobs:
           sed -i '/<meta charset="UTF-8">/a\  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" \/>\n  <meta http-equiv="Pragma" content="no-cache" \/>\n  <meta http-equiv="Expires" content="0" \/>' docs-dist/$ENVIRONMENT/index.html
 
           sed -i "s|Swagger UI|$APP_NAME_FOR_SWAGGER_PAGES|g" docs-dist/$ENVIRONMENT/index.html
-
-          # Update current release
-          # echo ${{ steps.swagger-ui.outputs.release_tag }} > swagger-ui.version
-
-      # - name: Deploy
-      #   uses: peaceiris/actions-gh-pages@v3
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./docs-dist
-      #     destination_dir: ./docs-dist
-      #     publish_branch: api-documentation-github-pages
-
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
